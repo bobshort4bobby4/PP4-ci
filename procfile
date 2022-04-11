@@ -1,1 +1,1 @@
-web: gunicorn pp4-ci.wsgi
+web: gunicorn PP4-CI.wsgi
