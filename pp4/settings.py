@@ -77,7 +77,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pp4.wsgi.application'
 
-ALLOWED_HOSTS = ['pp4.herokuapp.com', 'localhost']
+ALLOWED_HOSTS = ['pp4-ci.herokuapp.com', 'localhost']
 
 
 # Database
