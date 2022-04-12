@@ -26,7 +26,13 @@ She also requested a review section where customers could leave feedback on thei
 
 <details>  
             
-<summary>User Experience/User Interface (UX/UI)</summary>  
+<summary>User Experience/User Interface (UX/UI)</summary>    
+  
+  
+  
+   
+  
+The AGIILE methodology for project development will be used to produce this project, this method involves continual collaboration between all parties and improvments   at every stage. It helps to ensure good quality products are produced within time and financial constraints.
   
    ### User Stories  
   
