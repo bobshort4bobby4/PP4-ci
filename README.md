@@ -27,6 +27,7 @@ She also requested a review section where customers could leave feedback on thei
 <details>  
             
 <summary>User Experience/User Interface (UX/UI)</summary>  
+  
    ### User Stories  
   
    #### Casual Visitor Goals
@@ -53,6 +54,18 @@ She also requested a review section where customers could leave feedback on thei
   - to be able to view customer information to enable efficient communication.
   - to provide a quality website in order to drive sales and increase profits.
   
+  
+  Using the user stories as a frame of reference the following Epics were formulated;
+  
+  - implement basic html and django structure
+  - implement user registration and login
+  - implement room booking management system
+  - implement user feedback system
+  - optimise the django admin panel to aid hotel management functions.
+  
+  The user stories were prioritised using the MoSCoW technique and the Kanban Board feature built-in to Github will be used as an information radiator.
+  The user stories were broken down into tasks and these were listed under their respective Epic in the initial Kanban Board/
+  Care was taken to ensure should-have proioritised user stories are not greater than 60% of the total.
   
   ### Wireframes
   
