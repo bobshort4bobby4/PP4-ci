@@ -13,6 +13,8 @@ class RoomType(models.Model):
     description = models.TextField(max_length=250, null=False)
     price = models.DecimalField(max_digits=5, decimal_places=2)
     occupancy = models.IntegerField()
+    image_url = models.URLField(max_length=1024, null=True, blank=True)
+    image = models.ImageField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.type}'

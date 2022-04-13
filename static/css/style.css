@@ -13,3 +13,33 @@ body {
     margin:15px;
     max-width:25%;
 }
+
+.hotel_img {
+    /* width:263px;
+    height:270px; */
+    position: relative;
+    margin-bottom: 10px;
+    overflow: hidden;
+    border-radius: 10px;
+   
+}
+
+.hotel_img a {
+    background-color: #21c7f3;
+}
+
+.roompic {
+    margin:auto;
+}
+
+.title_colour {
+    color:white;
+}
+
+.roomtype {
+    color:blue;
+}
+
+.navbg {
+    background-color:#21c7f3;
+}
