@@ -1,0 +1,15 @@
+html{
+    height:100%;
+}
+
+
+body {
+    background: url('/media/backgrd.png') no-repeat center center fixed;
+    background-size: cover;
+}
+
+.roomcard {
+    background-color: darksalmon;
+    margin:15px;
+    max-width:25%;
+}
