@@ -15,8 +15,6 @@ body {
 }
 
 .hotel_img {
-    /* width:263px;
-    height:270px; */
     position: relative;
     margin-bottom: 10px;
     overflow: hidden;
@@ -37,9 +35,21 @@ body {
 }
 
 .roomtype {
-    color:blue;
+    color:white;
+    background-color: rgba(0, 0, 0, .3);
+}
+
+.check {
+    position:relative;
+    top:-90px;
+
 }
 
 .navbg {
     background-color:#21c7f3;
+    color:black;
+}
+
+.cus-nav-p {
+    padding: 0.5rem 1rem;
 }

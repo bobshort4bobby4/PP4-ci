@@ -28,7 +28,7 @@ class Room(models.Model):
    
 
     def __str__(self):
-        return f'{self.room_number} '
+        return f'{self.room_number}'
 
 class Booking(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

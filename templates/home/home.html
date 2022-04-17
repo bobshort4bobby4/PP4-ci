@@ -5,22 +5,22 @@
 
 <section class="container" style="margin-top:100px;">
     <div class="container">
-        <div class="section_title text-center title_colour mb-5">
+        <div class="section_title text-center title_colour mb-5 roomtype">
             <h2 >Hotel Accomodation</h2>
-            <h3>Choose from our differnt room sizes, They're all great!  </h3>
+            <h3>Choose from our different room sizes, They're all great!  </h3>
         </div>
 
 
         <div class=" card-container row mb_30">
-            {% for i in object_list%}
+            {% for i in room_types %}
             <div class="col-sm-12  offset-md-3 col-md-6  offset-lg-0 col-lg-4">
                 <div class="accomodation_item text-center">
                     <div class="hotel_img">
                         <img class="roompic" src="{{ i.image_url }}" alt="roompicture">
-                        <a href="book_1/{{i.type}}" class="btn mt-4">Book Now</a>
+                        <a href="book_1/{{i.type}}" class="btn mt-4 check">Check Availability</a>
                     </div>
                     <h4 class="roomtype">{{ i.type }}</h4></a>
-                    <h5>€{{ i.price}}<small>/night</small></h5>
+                    <h5 class="roomtype">€{{ i.price}}/night</h5>
                 </div>
             
             </div>

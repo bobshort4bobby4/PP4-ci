@@ -2,13 +2,44 @@
   // Use IntelliSense to learn about possible attributes.
   // Hover to view descriptions of existing attributes.
   "version": "0.2.0",
-  "configurations": [
-      {
-            "name": "Python: Current File (Integrated Terminal)",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "internalConsole"
-        }
+  "configurations": [{
+      "name": "Python: Django",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": ["runserver"],
+      "django": true,
+      "justMyCode": true
+    },
+
+    {
+      "name": "Python: Current File (Integrated Terminal)",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "internalConsole"
+      },
+
+    {
+
+      "name": "roombook",
+      "type": "python",
+      "request": "launch",
+      "program": "manage.py",
+      "console": "internalConsole",
+      "args": ["runserver"]
+      },
+
+    {
+
+      "name": "test",
+      "type": "python",
+      "request": "launch",
+      "program": "manage.py ",
+      "console": "internalConsole",
+      "args": ["test"]
+      }
+      
   ]
-}
+  
+
