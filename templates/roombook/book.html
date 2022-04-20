@@ -1,13 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+
     <div class="container d-flex flex-column align-items-center" style="color:white;">
-        <h1>{{ user }} book room {{ room }}</h1>
-        <h1> From {{ check_in}} to {{ check_out}}</h1>
+        
+        <h1>{{ user }} book room {{ type.room_number }}</h1>
+        <h1> From {{ type.check_in}} to {{ type.check_out}}</h1>
         <form  class="d-flex flex-column " style="color:white; font-size:medium;" action="" method="POST">
             {{ form.as_p }}
             {% csrf_token %}
-            <button type="submit">BOOK UNIT</button>
+            <button type="submit">BOOK Room</button>
         </form>
-</div>
+    </div>
 {% endblock %}

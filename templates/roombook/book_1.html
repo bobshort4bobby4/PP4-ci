@@ -2,11 +2,11 @@
 
 {% block content %}
     <div class="container d-flex flex-column align-items-center" style="color:white;">
-        <h1>Book a {{type}} Unit</h1>
+        <h1>Check Availability for a {{type}} Room</h1>
         <form  class="d-flex flex-column " style="color:white; font-size:medium;" action="" method="POST">
             {{ form.as_p }}
             {% csrf_token %}
-            <button type="submit">CHECK AVAILABILITY & Book</button>
+            <button type="submit">CHECK AVAILABILITY </button>
         </form>
 </div>
 {% endblock %}
