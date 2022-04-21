@@ -7,6 +7,7 @@ from django.contrib import messages
 from booking_code.check_availability import check_availability
 from datetime import date
 import json
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 class AvailabilityView(View):
@@ -119,7 +120,12 @@ class BookView(View):
         return render(request, self.template_name, {'type':data})
 
 
+   
     def post(self, request, *args,**kargs):
+        if not request.user.is_authenticated :
+            messages.error(request, 'Please sign in to make a Booking .')
+            return redirect(reverse('home:home'))
+
         outfile = self.kwargs.get('context', None)
         with open('context.json') as json_file:
             booking_data = json.load(json_file)
