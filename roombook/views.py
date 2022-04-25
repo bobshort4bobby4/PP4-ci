@@ -5,7 +5,7 @@ from .models import Room, RoomType, Booking
 from forms.forms import AvailabilityForm
 from django.contrib import messages
 from booking_code.check_availability import check_availability
-from datetime import date
+from datetime import date, datetime
 import json
 from django.contrib.auth.decorators import login_required
 # Create your views here.
@@ -31,7 +31,7 @@ class AvailabilityView(View):
         
        
     def post(self, request, *args, **kwargs):
-
+        
         type = self.kwargs.get('type', None)
         if type == 'Single':      # convert to int to match type of type_id in table
             typeint = 1
@@ -58,6 +58,9 @@ class AvailabilityView(View):
             return redirect( reverse('roombook:book_1',kwargs={'type':type}))
         
         available_rooms = [] # empty list to hold units that have availability for desired dates
+        
+        
+
 
         # check dates are chronological correct
         if data['check_in'] < date.today() or data['check_out'] < data['check_in']:
@@ -83,8 +86,14 @@ class AvailabilityView(View):
             with open("context.json", "w") as outfile:
                 json.dump(context, outfile)
 
-       
-            return redirect('/roombook/book/<context>', {'context':outfile})
+            context= {
+                'contoxt':outfile,
+                
+
+            }
+
+            
+            return redirect('/roombook/book/<context>', context)
                       
                                      
         else:
@@ -98,10 +107,47 @@ class BookView(View):
     template_name = 'roombook/book.html'
 
     def get(self, request, *args, **kwargs):
-        outfile = self.kwargs.get('context', None)
+        outfile = self.kwargs.get('contoxt', None)
+        
         with open('context.json') as json_file:
             data = json.load(json_file)
-        return render(request, self.template_name, {'type':data})
+
+        bookings = Booking.objects.all()
+        rooms = Room.objects.all()
+        bookedrooms = []
+
+
+        
+        y = int(data['check_in'][0:4])
+        m = int(data['check_in'][5:7])
+        d = int(data['check_in'][8:10])
+         
+        cin = date(y, m, d)  
+        for room in rooms:
+            for booking in bookings:
+                if booking.room_number_id == room.room_number:
+                    if cin > booking.check_in:
+                        if cin < booking.check_out:
+                            bookedrooms.append(room)
+
+        countbookedrooms = int(len(bookedrooms))
+        counttotalroom = Room.objects.all().count()
+
+        if ((countbookedrooms/counttotalroom)/100) < 60:
+            sale_flag = True
+        else:
+            sale_flag = False
+
+        context = {
+            'type':data,
+            'sale_flag':sale_flag,
+        }
+
+
+
+
+        return render(request, self.template_name, context)
+        # return render(request, self.template_name, {'type':data})
 
 
    
@@ -109,6 +155,9 @@ class BookView(View):
         if not request.user.is_authenticated :
             messages.error(request, 'Please sign in to make a Booking .')
             return redirect(reverse('home:home'))
+
+        
+ 
 
         outfile = self.kwargs.get('context', None)
         with open('context.json') as json_file:

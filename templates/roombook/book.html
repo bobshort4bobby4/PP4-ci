@@ -4,6 +4,15 @@
 
 
     <div class="container d-flex flex-column align-items-center" style="color:white;">
+        <div style ="display:block">
+            <p>
+               
+                {% if sale_flag %}
+                    <h2 class="" style="color:red;">FLASH SALE! 10% off if you book now</h2>
+                {% endif%}
+            </p>
+
+        </div>
         
         <h1>{{ user }} book room {{ type.room_number }}</h1>
         <h1> From {{ type.check_in}} to {{ type.check_out}}</h1>
