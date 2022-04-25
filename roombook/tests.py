@@ -16,6 +16,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.messages import get_messages
+import json
 
 
 @tag('forms')
@@ -42,50 +43,171 @@ class TestAvailabilityForm(TestCase):
         form = AvailabilityForm()
         self.assertEqual(form.Meta.fields, ['check_in', 'check_out'])
 
+
 @tag('views')
 class TestRoombookViews(TestCase):
 
-    def test_homeview_renders_correct_template(self):
-        client = Client()
-        response = self.client.get(reverse('roombook:home'))
-        self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'roombook/home.html')
-
-    def test_availableformview_get_renders_correct_template(self):
-        # creates an correct instance of RoomType and checks correct template rendered
+    def test_availabilityview_get_renders_correct_template(self):
+        #  creates an correct instance of RoomType and checks correct template rendered
         item = RoomType.objects.create(type='Single', description='blahblah', price=10, occupancy=1,image_url='', image='')
-        response = self.client.get(f'/book_1/{ item.type}/')
-        self.assertEqual(response.status_code, 200)
+        response = self.client.get(f'/roombook/book_1/{ item.type}/')
+        self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'roombook/book_1.html')
-        
-    def test_availableformview_get_renders_correct_template_if_type_wrong(self):
+
+    def test_availabilityview_get_renders_correct_template_if_type_wrong(self):
         # creates an incorrect instance of RoomType and checks correct template rendered
         item = RoomType.objects.create(type='wrong', description='blahblah', price=10, occupancy=1,image_url='', image='')
-        response = self.client.get(f'/book_1/{ item.type}/')
-        self.assertNotEqual(response.status_code, 200)
-        # checks home page rendered if type incorrect
-        response = self.client.get('')
-        self.assertEqual(response.status_code, 200)
+        response = self.client.get(f'/roombook/book_1/{ item.type}/')
+        self.assertNotEqual(response.status_code,200)
+        self.assertRedirects(response, reverse('home:home'))
+        
 
-    def test_availableformview_post_return_home_if_user_not_auth(self):
+    def test_availsbility_post_redirects_to_homepage_if_no_available_rooms(self):
+        available_rooms = []
+        
+
+
+    def test_bookview_get_renders_correct_template(self):
+        # create instance of RoomType
+        itemtype = RoomType(type='Single', price=10, occupancy=1) 
+        itemtype.save()
+
+        # create instance of Room                                          
+        roomnum = Room(room_number=2, type=itemtype)
+        roomnum.save()
+
+         # create User instance
+        user_model = get_user_model()
+        self.user = user_model.objects.create_user(username='brian',
+                                                   password='dogskin12')
+
+        context = {
+                        'user':self.user,
+                        'room_number':roomnum,
+                        'check_in':'2022-05-01',
+                        'check_out':'2022-05-03',
+                        'is_active':True,
+            }
+        response = self.client.get(f'/roombook/book/{context}/')
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response, 'roombook/book.html')
+
+
+    def test_bookview_post_creates_booking(self):
+        # create instance of RoomType
+        itemtype = RoomType(type='Single', price=10, occupancy=1) 
+        itemtype.save()
+
+        # create User instance
+        user_model = get_user_model()
+        self.user = user_model.objects.create_user(username='brian',
+                                                   password='dogskin12')
+
+        
+        # create instance of Room                                          
+        roomnum = Room(room_number=2, type=itemtype)
+        roomnum.save()
+
+        countbookings = Booking.objects.all().count()
+        print(countbookings)
+        booking = Booking.objects.create(user=self.user, room_number=roomnum,
+                                                        check_in='2022-05-01', check_out='2022-05-03', is_active=True)
+        countbookings = Booking.objects.all().count()
+        print(countbookings)
+        context = {
+                # 'user':str(self.request.username),
+                'room_number':str(roomnum),
+                'check_in':'2022-05-01',
+                'check_out':'2022-05-03',
+                'is_active':True,
+
+            }
+        
+            # convert dict to json string
+        with open("context.json", "w") as outfile:
+            json.dump(context, outfile)
+
+        response = self.client.post(f'/roombook/book/{outfile}/',{
+                                                                        'user':self.user,
+                                                                        'room_number':roomnum,
+                                                                        'check_in':'2022-05-01',
+                                                                        'check_out':'2022-05-03',
+                                                                        'is_active':True,
+                                                            
+
+        })
+        print(response.context)
+        self.assertEqual(Booking.objects.all().count(),1)
+
+
+
+
+
+        # # count instances of booking
+        # countbookings = Booking.objects.all().count()
+        # print(countbookings)
+        #  # create instance of RoomType
+        # itemtype = RoomType(type='Single', price=10, occupancy=1) 
+        # itemtype.save()
+
+        # # create instance of Room                                          
+        # roomnum = Room(room_number=2, type=itemtype)
+        # roomnum.save()
+
+        #  # create User instance
         # user_model = get_user_model()
-        # self.user = user_model.objects.create_user(username=' ',
-        #                                            password='hopscotch')
-        self.user = AnonymousUser()
-        item = RoomType.objects.create(type='Single', description='blahblah', price=10, occupancy=1,image_url='', image='')
-        response = self.client.post(f'/book_1/{ item.type}/')
-        self.assertNotEqual(response.status_code, 200)
-        response = self.client.get('')
-        self.assertTemplateUsed(response, 'roombook/home.html')
-        self.assertEqual(response.status_code, 200)
+        # self.user = user_model.objects.create_user(username='brian',
+        #                                            password='dogskin12')
+
+        # context = {
+        #                 'user':self.user,
+        #                 'room_number':roomnum,
+        #                 'check_in':'2022-05-01',
+        #                 'check_out':'2022-05-03',
+        #                 'is_active':True,
+        #     }
+        # response = self.client.post(f'/roombook/book/{context}/', {'user':self.user, 'room_number':roomnum,
+        #                                                  'check_in':'2022-05-01', 'check_out':'2022-05-03', 'is_active':True})
+        # countbookings = Booking.objects.all().count()
+        # print(countbookings)
+      
+        # self.assertRedirects(response, reverse('home:home'))
+        # self.assertTemplateUsed(response, 'home/home.html')
 
 
-    def test_type_kwarg_is_correct(self):
-        type = 'wrong'
-        response = self.client.post(f'/book_1/{type}')
-        storage = get_messages(response)
-        for message in storage:
-            print(message)
+
+
+
+    # def test_bookview_redirects_if_user_is_anonymous(self):
+        
+    #     self.user = AnonymousUser()
+    #     response = self.client.post('/roombook/book/{context}')
+    #     self.assertTemplateUsed(response, 'roombook/book.html')
+    #     # self.assertRedirects(response, reverse('home:home'))
+
+
+
+
+
+#     def test_availableformview_post_return_home_if_user_not_auth(self):
+#         # user_model = get_user_model()
+#         # self.user = user_model.objects.create_user(username=' ',
+#         #                                            password='hopscotch')
+#         self.user = AnonymousUser()
+#         item = RoomType.objects.create(type='Single', description='blahblah', price=10, occupancy=1,image_url='', image='')
+#         response = self.client.post(f'/book_1/{ item.type}/')
+#         self.assertNotEqual(response.status_code, 200)
+#         response = self.client.get('')
+#         self.assertTemplateUsed(response, 'roombook/home.html')
+#         self.assertEqual(response.status_code, 200)
+
+
+#     def test_type_kwarg_is_correct(self):
+#         type = 'wrong'
+#         response = self.client.post(f'/book_1/{type}')
+#         storage = get_messages(response)
+#         for message in storage:
+#             print(message)
 
 
 #             -----------------------------not working------------------------------------------

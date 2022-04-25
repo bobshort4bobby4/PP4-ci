@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'cloudinary',
     'roombook',
     'home',
+    'myaccount',
 ]
 
 SITE_ID = 1

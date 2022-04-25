@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5" style="background-color:white;">
+    <div class="row">
+        <div>
+            <H1 style="color:red;">TESTESTTEST</H1>
+        </div>
+    </div>
+    {% for booking in mybookings %}
+        <div>
+            <h1>{{ booking.user }} {{ booking.room_number }} {{ booking.check_in }}
+                 {{ booking.check_out }} {{booking.id}}<span><a href="{% url 'myaccount:extend' booking.id %}">Extend</a>
+                </span><span><a href="{% url 'myaccount:cancel' booking.id %}">Cancel</a></span></h1>
+        </div>
+    {% empty %}
+        <div>
+            <h1>You currently have no bookings</h1>
+        </div>
+    {% endfor%}  
+    <div>
+        <p>
+            {{user.username}}, {{ user.email }}
+        </p>
+    </div> 
+</div>
+
+{% endblock%}

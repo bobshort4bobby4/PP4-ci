@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 col-lg-4 offset-lg-4 p-4" style="background-color:aliceblue;">
+    <div class="row justify-content-center">
+        <div class="col-md8 offset-2">
+            <div>User: {{bookid.user}}</div>
+            <div>Room Number:{{ bookid.room_number}}</div>
+            <div>Check In: {{ bookid.check_in}}</div>
+            <div>Old Check Out: {{ bookid.check_out}}</div>
+            <div>Enter new desired check out date </div>
+            <form  class="d-flex flex-column " style="color:white; font-size:medium;" action="" method="POST">
+                {{ form.as_p }}
+                {% csrf_token %}
+                <button type="submit">Extend </button>
+            </form>
+        
+            <!-- <h1 style="color:red;">testtestets{{booking.id}}{{booking.user}}{{booking.check_in}} {{booking.check_out}}</h1> -->
+        </div>
+    </div>
+</div>       
+{% endblock %}

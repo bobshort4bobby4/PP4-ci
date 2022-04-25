@@ -31,10 +31,6 @@ class AvailabilityView(View):
         
        
     def post(self, request, *args, **kwargs):
-        # if not request.user.is_authenticated :
-        #     messages.error(request, 'Please sign in to make a Booking .')
-        #     return redirect(reverse('roombook:home'))
-
 
         type = self.kwargs.get('type', None)
         if type == 'Single':      # convert to int to match type of type_id in table
@@ -87,21 +83,9 @@ class AvailabilityView(View):
             with open("context.json", "w") as outfile:
                 json.dump(context, outfile)
 
-          
-            
-            # context = json.dumps(context)
-            
-            # with open('context.json') as json_file:
-            #     data = json.load(json_file)
-                
-            # return render(request,'roombook/book.html',context)
+       
             return redirect('/roombook/book/<context>', {'context':outfile})
-
-            # django docs
-            # redirect(to, *args, permanent=False, **kwargs)¶
-    #         def my_view(request):
-    # ...
-    # return redirect('some-view-name', foo='bar')                          
+                      
                                      
         else:
                 messages.warning(request, 'All of this size of unit are booked!! Try another one')

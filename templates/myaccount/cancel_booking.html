@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 col-lg-4 offset-lg-4 p-4" style="background-color:aliceblue;">
+    <div class="row justify-content-center">
+        <div class="col-md8 offset-2">
+            <form method="post">{% csrf_token %}
+     
+ 
+ 
+                <p>Are you sure you want to delete "{{ booking.id }}"?</p>
+                <p>{{ booking.room_number}}, {{ booking.check_in}}, {{ booking.check_out}}</p>
+                 
+                 
+                 
+                    <input type="submit" value="Confirm">
+                </form>
+        
+            <!-- <h1 style="color:red;">testtestets{{booking.id}}{{booking.user}}{{booking.check_in}} {{booking.check_out}}</h1> -->
+        </div>
+    </div>
+</div>       
+{% endblock %}
