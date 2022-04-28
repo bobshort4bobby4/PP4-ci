@@ -3,6 +3,7 @@
 {% block content %}
     <div class="container d-flex flex-column align-items-center" style="color:white;">
         <h1>Check Availability for a {{type}} Room</h1>
+        <h2>{{ desc.description }}</h2>
         <form  class="d-flex flex-column " style="color:white; font-size:medium;" action="" method="POST">
             {{ form.as_p }}
             {% csrf_token %}

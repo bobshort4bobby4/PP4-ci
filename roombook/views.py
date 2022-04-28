@@ -16,12 +16,18 @@ class AvailabilityView(View):
 
     def get(self, request, *args, **kwargs):
         type = self.kwargs.get('type', None)
+        desc = RoomType.objects.get(type=type)
+       
+     
+       
         Room_Types = ['Single', 'Queen', 'Double']
         if  type in Room_Types:
                 form = AvailabilityForm()
                 context = {
                  'type': type,
-                 'form': form
+                 'form': form,
+                 'desc': desc,
+
                 }
                 return render(request, 'roombook/book_1.html', context)
         else:

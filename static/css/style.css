@@ -41,7 +41,23 @@ body {
 
 .check {
     position:relative;
-    top:-90px;
+    top:-135px;
+
+}
+
+.check1 {
+    position:relative;
+    top:-250px;
+    width:50%;
+    margin:auto
+
+}
+
+.check2 {
+    position:relative;
+    top:-250px;
+    width:50%;
+    margin: auto;
 
 }
 
