@@ -73,8 +73,7 @@ class AvailabilityView(View):
 
         if len(available_rooms) > 0: #if there is at least one room available 
             room = available_rooms[0]
-            context = {
-                # 'user':str(self.request.username),
+            booking = {
                 'room_number':str(room),
                 'check_in':form.data['check_in'],
                 'check_out':form.data['check_out'],
@@ -84,16 +83,14 @@ class AvailabilityView(View):
         
             # convert dict to json string
             with open("context.json", "w") as outfile:
-                json.dump(context, outfile)
+                json.dump(booking, outfile)
 
-            context= {
-                'contoxt':outfile,
-                
-
+            booking= {
+                'context':outfile,
             }
 
-            
-            return redirect('/roombook/book/<context>', context)
+            # send to book template
+            return redirect('/roombook/book/<booking>/', booking)
                       
                                      
         else:
@@ -107,17 +104,15 @@ class BookView(View):
     template_name = 'roombook/book.html'
 
     def get(self, request, *args, **kwargs):
-        outfile = self.kwargs.get('contoxt', None)
-        
+        outfile = self.kwargs.get('context', None)
+        # convert json file
         with open('context.json') as json_file:
             data = json.load(json_file)
-
+        
+        # check occupancy rate for checkin date
         bookings = Booking.objects.all()
         rooms = Room.objects.all()
         bookedrooms = []
-
-
-        
         y = int(data['check_in'][0:4])
         m = int(data['check_in'][5:7])
         d = int(data['check_in'][8:10])
@@ -126,14 +121,15 @@ class BookView(View):
         for room in rooms:
             for booking in bookings:
                 if booking.room_number_id == room.room_number:
-                    if cin > booking.check_in:
-                        if cin < booking.check_out:
+                    if cin >= booking.check_in:
+                        if cin <= booking.check_out:
                             bookedrooms.append(room)
 
         countbookedrooms = int(len(bookedrooms))
         counttotalroom = Room.objects.all().count()
-
-        if ((countbookedrooms/counttotalroom)/100) < 60:
+        # if occupancy rate below 60% set sale flag to true
+        occrate = (countbookedrooms/counttotalroom)*100
+        if (occrate) < 50:
             sale_flag = True
         else:
             sale_flag = False
@@ -142,28 +138,23 @@ class BookView(View):
             'type':data,
             'sale_flag':sale_flag,
         }
-
-
-
-
         return render(request, self.template_name, context)
-        # return render(request, self.template_name, {'type':data})
+       
 
 
    
     def post(self, request, *args,**kargs):
+        # check if user logged in
         if not request.user.is_authenticated :
             messages.error(request, 'Please sign in to make a Booking .')
             return redirect(reverse('home:home'))
 
-        
- 
-
+        #convert json file
         outfile = self.kwargs.get('context', None)
         with open('context.json') as json_file:
             booking_data = json.load(json_file)
 
-        u = request.user.username
+        # get instance of Room
         room = Room.objects.get(room_number=booking_data['room_number'])
 
         booking = Booking.objects.create(
@@ -174,8 +165,7 @@ class BookView(View):
                         is_active=True
                     )
         booking.save()   # make the booking
-        # check_in = form.data['check_in']
-        # check_out = form.data['check_out']
+        
         messages.success(request, f"Thank you for booking room { booking_data['room_number'] } from { booking_data['check_in'] } to {booking_data['check_out'] }")
         return redirect(reverse('home:home'))
            

@@ -19,7 +19,7 @@ class ShowDetails(ListView):
 
     def get_queryset(self):
         return Booking.objects.filter(
-            user=self.request.user)
+            user=self.request.user, is_active=True)
  
 
 class CancelBooking(SuccessMessageMixin, DeleteView):

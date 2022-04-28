@@ -17,7 +17,7 @@
         <h1>{{ user }} book room {{ type.room_number }}</h1>
         <h1> From {{ type.check_in}} to {{ type.check_out}}</h1>
         <form  class="d-flex flex-column " style="color:white; font-size:medium;" action="" method="POST">
-            {{ form.as_p }}
+            <!--{{ form.as_p }}-->
             {% csrf_token %}
             <button type="submit">BOOK Room</button>
         </form>

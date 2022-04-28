@@ -62,8 +62,8 @@ class TestRoombookViews(TestCase):
         self.assertRedirects(response, reverse('home:home'))
         
 
-    def test_availsbility_post_redirects_to_homepage_if_no_available_rooms(self):
-        available_rooms = []
+#     def test_availsbility_post_redirects_to_homepage_if_no_available_rooms(self):
+#         available_rooms = []
         
 
 
@@ -93,57 +93,136 @@ class TestRoombookViews(TestCase):
         self.assertTemplateUsed(response, 'roombook/book.html')
 
 
-    def test_bookview_post_creates_booking(self):
-        # create instance of RoomType
+
+
+
+    def test_bookview_post_can_add_booking(self):
+        """
+        New bookings can be added to database
+        """
+        # self.client.login(username='robert', password='testing321')
+            # create instance of RoomType
         itemtype = RoomType(type='Single', price=10, occupancy=1) 
         itemtype.save()
 
+            #create instance of Room                                          
+        roomnum = Room(room_number=2, type=itemtype)
+        roomnum.save()
+
+            # create User instance
+        user_model = get_user_model()
+        self.user = user_model.objects.create_user(username='robert',
+                                                    password='testing321')
+
+        #---------------------Print to terminal---------------------------------
+        countbookings = Booking.objects.all().count()
+        print(countbookings, 'records in bookings before post ')
+        #-----------------------------------------------------------------------
+
+
+        context = {
+                        'user':self.user,
+                        'room_number':roomnum,
+                        'check_in':'2022-05-01',
+                        'check_out':'2022-05-03',
+                        'is_active':True,
+            }
+        response = self.client.post(f'/roombook/book/{context}/')
+
+        #------------------Print to terminal---------------------------------
+        countbookings = Booking.objects.all().count()
+        print(countbookings, 'records in bookings after post ')
+        books = Booking.objects.all()
+        print(books)
+        #---------------------------------------------------------------------
+
+        new_booking = Booking.objects.filter(user=self.user)
+        self.assertEqual(len(new_booking), 1)
+        # self.assertRedirects(response, reverse('home:home'))
+        # self.assertTemplateUsed(response, 'roombook/book.html')
+
+
+
+ 
+@tag('models')
+class TestRoomBookModels(TestCase):
+
+    def test_item_string_method_returns_type_for_roomtype_model(self):
+        # create sample row of RoomType table and compare to expected output
+        item = RoomType.objects.create(type='Single', description='blahblah', price=10, occupancy=1,image_url='', image='')
+        self.assertEqual(str(item), 'Single')
+
+    def test_item_string_method_returns_roomnumber_for_room_model(self):
+        itemtype = RoomType(type='Single', price=10, occupancy=1) 
+        itemtype.save()
+        item = Room.objects.create(room_number=10, type=itemtype)
+        self.assertEqual(str(item), '10')
+
+    def test_item_string_method_returns_correct_string_for_booking_model(self):
+        # create instance of RoomType
+        itemtype = RoomType(type='Single', price=10, occupancy=1) 
+        itemtype.save()
         # create User instance
         user_model = get_user_model()
         self.user = user_model.objects.create_user(username='brian',
                                                    password='dogskin12')
-
-        
         # create instance of Room                                          
         roomnum = Room(room_number=2, type=itemtype)
         roomnum.save()
+        # create sample Booking table row and compare with expected output
+        item = Booking.objects.create(user=self.user, room_number=roomnum , check_in='2022-02-01', check_out='2022-02-03', is_active=True)
+        self.assertEqual(str(item),'brian has booked  Room 2 from 2022-02-01 to 2022-02-03')
+       
 
-        countbookings = Booking.objects.all().count()
-        print(countbookings)
-        booking = Booking.objects.create(user=self.user, room_number=roomnum,
-                                                        check_in='2022-05-01', check_out='2022-05-03', is_active=True)
-        countbookings = Booking.objects.all().count()
-        print(countbookings)
-        context = {
-                # 'user':str(self.request.username),
-                'room_number':str(roomnum),
-                'check_in':'2022-05-01',
-                'check_out':'2022-05-03',
-                'is_active':True,
 
-            }
+    
         
-            # convert dict to json string
-        with open("context.json", "w") as outfile:
-            json.dump(context, outfile)
+      
 
-        response = self.client.post(f'/roombook/book/{outfile}/',{
-                                                                        'user':self.user,
-                                                                        'room_number':roomnum,
-                                                                        'check_in':'2022-05-01',
-                                                                        'check_out':'2022-05-03',
-                                                                        'is_active':True,
-                                                            
+# ---------------------------------------------------
+    # def test_bookview_post_creates_booking(self):
+    #     # create instance of RoomType
+    #     itemtype = RoomType(type='Single', price=10, occupancy=1) 
+    #     itemtype.save()
 
-        })
-        print(response.context)
-        self.assertEqual(Booking.objects.all().count(),1)
+    #     # create User instance
+    #     user_model = get_user_model()
+    #     self.user = user_model.objects.create_user(username='brian',
+    #                                                password='dogskin12')
 
+        
+    #     # create instance of Room                                          
+    #     roomnum = Room(room_number=2, type=itemtype)
+    #     roomnum.save()
 
+    #     countbookings = Booking.objects.all().count()
+    #     print(countbookings)
+    #     booking = Booking.objects.create(user=self.user, room_number=roomnum,
+    #                                                     check_in='2022-05-01', check_out='2022-05-03', is_active=True)
+    #     countbookings = Booking.objects.all().count()
+    #     print(countbookings)
+    #     context = {
+    #             # 'user':str(self.request.username),
+    #             'room_number':str(roomnum),
+    #             'check_in':'2022-05-01',
+    #             'check_out':'2022-05-03',
+    #             'is_active':True,
 
+    #         }
+        
+    #         # convert dict to json string
+    #     with open("context.json", "w") as outfile:
+    #         json.dump(context, outfile)
 
-
-        # # count instances of booking
+    #     response = self.client.post(f'/roombook/book/{outfile}/',{
+    #                                                                     'user':self.user,
+    #                                                                     'room_number':roomnum,
+    #                                                                     'check_in':'2022-05-01',
+    #                                                                     'check_out':'2022-05-03',
+    #                                                                    'is_active':True,
+    #     })
+    #     print(response.context)
+    #     self.assertEqual(Booking.objects.all().count(),1) # count instances of booking
         # countbookings = Booking.objects.all().count()
         # print(countbookings)
         #  # create instance of RoomType
@@ -314,42 +393,6 @@ class TestRoombookViews(TestCase):
 #         self.assertEqual(len(existing_items), 0)
 
 
-
- 
-@tag('models')
-class TestRoomBookModels(TestCase):
-
-    def test_item_string_method_returns_type_for_roomtype_model(self):
-        # create sample row of RoomType table and compare to expected output
-        item = RoomType.objects.create(type='Single', description='blahblah', price=10, occupancy=1,image_url='', image='')
-        self.assertEqual(str(item), 'Single')
-
-    def test_item_string_method_returns_roomnumber_for_room_model(self):
-        itemtype = RoomType(type='Single', price=10, occupancy=1) 
-        itemtype.save()
-        item = Room.objects.create(room_number=10, type=itemtype)
-        self.assertEqual(str(item), '10')
-
-    def test_item_string_method_returns_correct_string_for_booking_model(self):
-        # create instance of RoomType
-        itemtype = RoomType(type='Single', price=10, occupancy=1) 
-        itemtype.save()
-        # create User instance
-        user_model = get_user_model()
-        self.user = user_model.objects.create_user(username='brian',
-                                                   password='dogskin12')
-        # create instance of Room                                          
-        roomnum = Room(room_number=2, type=itemtype)
-        roomnum.save()
-        # create sample Booking table row and compare with expected output
-        item = Booking.objects.create(user=self.user, room_number=roomnum , check_in='2022-02-01', check_out='2022-02-03', is_active=True)
-        self.assertEqual(str(item),'brian has booked  Room 2 from 2022-02-01 to 2022-02-03')
-       
-
-
-    
-        
-      
 
 
    

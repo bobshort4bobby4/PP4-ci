@@ -25,3 +25,8 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('myaccount/', include('myaccount.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+handler404 = 'handler_views.views.handle_not_found'
+handler500 = 'handler_views.views.handle_server_error'
+

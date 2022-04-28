@@ -2,6 +2,34 @@ from django.db import models
 from django.conf import settings
 from datetime import datetime, date
 
+
+class markoutdatedasinactive(models.Manager):
+    """ 
+    determines if the booking is past-tense and changes the isactive field to false if so
+    """
+
+    def set_inactive(self,bookings):
+        today = date.today()
+
+        for booking in bookings:
+            if booking.check_out < today:
+                booking.is_active = False
+                booking.save()
+        #this_booking what is that about 
+        return bookings
+
+    def all(self):
+        bookings = super().all() # is this ordinary all or my all or are they now the same thing?
+        bookings = self.set_inactive(bookings)
+        return bookings
+
+###  can i filter the booking to only include records that are active
+### when is this activated ? everytime the model is accessed yes it is
+### is it possible to activate only once per day at say mdnight  
+
+
+
+
 class RoomType(models.Model):
     Room_Types = (
         ('Single', 'Single'),
@@ -37,5 +65,10 @@ class Booking(models.Model):
     check_out = models.DateField(null=True)
     is_active = models.BooleanField(default= True)
 
+    objects = markoutdatedasinactive()
+
     def __str__(self):
         return f"{self.user} has booked  Room {self.room_number} from {self.check_in} to {self.check_out}"
+
+
+    
