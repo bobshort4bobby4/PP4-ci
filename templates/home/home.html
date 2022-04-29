@@ -31,17 +31,17 @@
         </div>
 
           <div style="background-color:beige;" class="mt-2 p-2">
-            <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
+            <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel" data-interval="12000">
                 <div class="carousel-inner">
                   
-                  {% for i in room_types %}
+                  {% for review in reviews %}
                     {% if forloop.first %}
                       <div class="carousel-item active">
-                        <p class="d-block w-100"  alt="First slide" style="color:red;">{{ i.description }}</p>
+                        <p class="d-block w-100"  alt="First slide" style="color:red;">{{ review.text }}..............{{ review.user.username}}, {{ review.created_on }}</p>
                       </div>
                     {% else %}
                       <div class="carousel-item ">
-                        <p class="d-block w-100"  alt="First slide" style="color:red;">{{ i.description }}..............{{ i.type}}</p>
+                        <p class="d-block w-100"  alt="First slide" style="color:red;">{{ review.text }}..............{{ review.user.username}}, {{ review.created_on }}</p>
                       </div>
                     {% endif %}
 

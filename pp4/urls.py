@@ -24,6 +24,7 @@ urlpatterns = [
     path('roombook/', include('roombook.urls')),
     path('accounts/', include('allauth.urls')),
     path('myaccount/', include('myaccount.urls')),
+    path('reviews/', include('reviews.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

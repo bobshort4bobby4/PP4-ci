@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'roombook',
     'home',
     'myaccount',
+    'reviews',
 ]
 
 SITE_ID = 1
