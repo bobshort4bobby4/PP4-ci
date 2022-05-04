@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from datetime import date
+from django.contrib.admin.sites import AdminSite
+from .admin import ReviewsAdmin
 
 
 @tag('views')
@@ -42,6 +44,77 @@ class TestReiewsModels(TestCase):
                                             approved=False,
                                                 is_active=False
                                                 )
-
+     
         self.assertEqual(str(review.user.username), 'testuser3')
+        self.assertTrue(isinstance(review, Reviews))
         
+
+
+
+@tag('admin')
+class TestAdminSite(TestCase):
+    def test_set_approved_to_true(self):
+        today = date.today()
+        test_user = User.objects.create_user(
+                username='testuser3', password='testpw1'
+                )
+
+        review = Reviews.objects.create(user= test_user,
+                                            text='first review',
+                                            created_on=today,
+                                            approved=False,
+                                            is_active=False
+                                                )
+    
+           # instance of admin 
+        self.reviewsadmin = ReviewsAdmin(model=Reviews, admin_site=AdminSite())
+
+        response = self.reviewsadmin.set_approved_to_true(request=review, queryset=Reviews.objects.all())
+        review = get_object_or_404(Reviews, pk=1)
+        
+        self.assertEqual(review.approved, True)
+
+
+    def test_set_is_active_to_true(self):
+            today = date.today()
+            test_user = User.objects.create_user(
+                    username='testuser3', password='testpw1'
+                    )
+
+            review = Reviews.objects.create(user= test_user,
+                                                text='first review',
+                                                created_on=today,
+                                                approved=False,
+                                                is_active=False
+                                                    )
+        
+            # instance of admin 
+            self.reviewsadmin = ReviewsAdmin(model=Reviews, admin_site=AdminSite())
+
+            response = self.reviewsadmin.set_is_active_to_true(request=review, queryset=Reviews.objects.all())
+            review = get_object_or_404(Reviews, pk=1)
+            
+            self.assertEqual(review.is_active, True)
+
+
+    def test_set_all_attributes_to_true(self):
+            today = date.today()
+            test_user = User.objects.create_user(
+                    username='testuser3', password='testpw1'
+                    )
+
+            review = Reviews.objects.create(user= test_user,
+                                                text='first review',
+                                                created_on=today,
+                                                approved=False,
+                                                is_active=False
+                                                    )
+        
+            # instance of admin 
+            self.reviewsadmin = ReviewsAdmin(model=Reviews, admin_site=AdminSite())
+
+            response = self.reviewsadmin.set_all_attributes_to_true(request=review, queryset=Reviews.objects.all())
+            review = get_object_or_404(Reviews, pk=1)
+            
+            self.assertEqual(review.is_active, True)
+            self.assertEqual(review.approved, True)
