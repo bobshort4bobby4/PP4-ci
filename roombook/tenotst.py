@@ -12,11 +12,16 @@ from booking_code.check_availability import check_availability
 from django.contrib.auth import get_user_model
 from django.contrib.auth import logout
 from django.contrib.sessions.models import Session
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.admin.sites import AdminSite
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.messages import get_messages
 import json
+from datetime import datetime, timedelta, date
+from .admin import RoomTypeAdmin
+
+
 
 
 @tag('forms')
@@ -58,14 +63,10 @@ class TestRoombookViews(TestCase):
         # creates an incorrect instance of RoomType and checks correct template rendered
         item = RoomType.objects.create(type='wrong', description='blahblah', price=10, occupancy=1,image_url='', image='')
         response = self.client.get(f'/roombook/book_1/{ item.type}/')
+        # print(response.context)
         self.assertNotEqual(response.status_code,200)
         self.assertRedirects(response, reverse('home:home'))
         
-
-#     def test_availsbility_post_redirects_to_homepage_if_no_available_rooms(self):
-#         available_rooms = []
-        
-
 
     def test_bookview_get_renders_correct_template(self):
         # create instance of RoomType
@@ -79,7 +80,7 @@ class TestRoombookViews(TestCase):
          # create User instance
         user_model = get_user_model()
         self.user = user_model.objects.create_user(username='brian',
-                                                   password='dogskin12')
+                                                   password='dogs12')
 
         context = {
                         'user':self.user,
@@ -88,58 +89,94 @@ class TestRoombookViews(TestCase):
                         'check_out':'2022-05-03',
                         'is_active':True,
             }
-        response = self.client.get(f'/roombook/book/{context}/')
+        response = self.client.get(f'/roombook/book/', context)
+        # print(response.context)
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response, 'roombook/book.html')
 
 
 
 
-
-    def test_bookview_post_can_add_booking(self):
-        """
-        New bookings can be added to database
-        """
-        # self.client.login(username='robert', password='testing321')
-            # create instance of RoomType
-        itemtype = RoomType(type='Single', price=10, occupancy=1) 
+    def test_availabilityview_post_redirects_if_type_incorrect(self):# does not work
+       
+         # create instance of RoomType
+        itemtype = RoomType(type='wrong', price=10, occupancy=1) 
         itemtype.save()
 
-            #create instance of Room                                          
+        # create instance of Room                                          
         roomnum = Room(room_number=2, type=itemtype)
         roomnum.save()
 
-            # create User instance
+         # create User instance
         user_model = get_user_model()
-        self.user = user_model.objects.create_user(username='robert',
-                                                    password='testing321')
-
-        #---------------------Print to terminal---------------------------------
-        countbookings = Booking.objects.all().count()
-        print(countbookings, 'records in bookings before post ')
-        #-----------------------------------------------------------------------
-
-
-        context = {
+        self.user = user_model.objects.create_user(username='brian',
+                                                   password='dogs12')
+        booking = {
                         'user':self.user,
                         'room_number':roomnum,
                         'check_in':'2022-05-01',
                         'check_out':'2022-05-03',
                         'is_active':True,
             }
-        response = self.client.post(f'/roombook/book/{context}/')
-
-        #------------------Print to terminal---------------------------------
-        countbookings = Booking.objects.all().count()
-        print(countbookings, 'records in bookings after post ')
-        books = Booking.objects.all()
-        print(books)
-        #---------------------------------------------------------------------
-
-        new_booking = Booking.objects.filter(user=self.user)
-        self.assertEqual(len(new_booking), 1)
+        # post request with type incorrect should redirect to home page
+        response= self.client.post(f'/roombook/book',booking)
+        self.assertNotEqual(response.status_code, 200)
         # self.assertRedirects(response, reverse('home:home'))
-        # self.assertTemplateUsed(response, 'roombook/book.html')
+       
+
+
+
+
+
+
+
+#----------------------------------------------------------------------------------------------
+#---------from here to models is junk--------------------------------------------------------
+
+#     def test_bookview_post_can_add_booking(self):
+#         """
+#         New bookings can be added to database
+#         """
+#         # self.client.login(username='robert', password='testing321')
+#             # create instance of RoomType
+#         itemtype = RoomType(type='Single', price=10, occupancy=1) 
+#         itemtype.save()
+
+#             #create instance of Room                                          
+#         roomnum = Room(room_number=2, type=itemtype)
+#         roomnum.save()
+
+#             # create User instance
+#         user_model = get_user_model()
+#         self.user = user_model.objects.create_user(username='robert',
+#                                                     password='testing321')
+
+#         #---------------------Print to terminal---------------------------------
+#         countbookings = Booking.objects.all().count()
+#         print(countbookings, 'records in bookings before post ')
+#         #-----------------------------------------------------------------------
+
+
+#         context = {
+#                         'user':self.user,
+#                         'room_number':roomnum,
+#                         'check_in':'2022-05-01',
+#                         'check_out':'2022-05-03',
+#                         'is_active':True,
+#             }
+#         response = self.client.post(f'/roombook/book/{context}/')
+
+#         #------------------Print to terminal---------------------------------
+#         countbookings = Booking.objects.all().count()
+#         print(countbookings, 'records in bookings after post ')
+#         books = Booking.objects.all()
+#         print(books)
+#         #---------------------------------------------------------------------
+
+#         new_booking = Booking.objects.filter(user=self.user)
+#         self.assertEqual(len(new_booking), 1)
+#         # self.assertRedirects(response, reverse('home:home'))
+#         # self.assertTemplateUsed(response, 'roombook/book.html')
 
 
 
@@ -174,9 +211,109 @@ class TestRoomBookModels(TestCase):
         self.assertEqual(str(item),'brian has booked  Room 2 from 2022-02-01 to 2022-02-03')
        
 
+@tag('admin')
+class TestAdminSite(TestCase):
+
+    def test_occupancy14_rate_function_is_correct(self):
+        # create instance of RoomType
+        itemtype = RoomType(type='Single', price=10, occupancy=1) 
+        itemtype.save()
+        # create User instance
+        user_model = get_user_model()
+        self.user = user_model.objects.create_user(username='brian',
+                                                   password='dog12')
+                                               
+       
+        # instance of admin 
+        self.roomtypemodeladmin = RoomTypeAdmin(model=RoomType, admin_site=AdminSite())
+
+        # create 10 instances of Room   
+        num_of_rooms = 10
+        for num in range(num_of_rooms):
+            roomnum =Room(room_number=num, type=itemtype)
+            roomnum.save()
+        rooms = Room.objects.all()
+        
+        # ten rooms for 14 nights means 140 possible nights if i book 14 nighs occ rate shoudl be 10%
+        roominstance = Room.objects.get(pk=1)
+       
+        today = date.today()
+        Booking.objects.create(
+                                user = self.user, 
+                                room_number= roominstance,
+                                check_in= today,
+                                check_out= today + timedelta(days=14),
+                                is_active= True   
+                                 )
+
+        bookings = Booking.objects.all()
+        print(len(bookings))
+        
+          # prepare client
+        User.objects.create_superuser(
+            username='superuser', password='secret', email='admin@example.com'
+        )
+        c = Client()
+        c.login(username='superuser', password='secret')                
 
     
+
+        #run test
+        response = self.roomtypemodeladmin.occupancy_14_Days(itemtype)
         
+        self.assertEqual(response,'10.0')
+        
+
+
+    def test_occupancy30_rate_function_is_correct(self):
+            # create instance of RoomType
+            itemtype = RoomType(type='Single', price=10, occupancy=1) 
+            itemtype.save()
+            # create User instance
+            user_model = get_user_model()
+            self.user = user_model.objects.create_user(username='brian',
+                                                    password='dog12')
+            # create 10 instance of Room                                          
+        
+            # instance of admin 
+            self.roomtypemodeladmin = RoomTypeAdmin(model=RoomType, admin_site=AdminSite())
+
+            num_of_rooms = 10
+            for num in range(num_of_rooms):
+                roomnum =Room(room_number=num, type=itemtype)
+                roomnum.save()
+            rooms = Room.objects.all()
+            
+            # ten rooms for 30 nights means 300 possible nights if i book 30 nights occ rate shoudl be 10%
+            roominstance = Room.objects.get(pk=1)
+        
+            today = date.today()
+            Booking.objects.create(
+                                    user = self.user, 
+                                    room_number= roominstance,
+                                    check_in= today,
+                                    check_out= today + timedelta(days=30),
+                                    is_active= True   
+                                    )
+
+            bookings = Booking.objects.all()
+            print(len(bookings))
+            
+            # prepare client
+            User.objects.create_superuser(
+                username='superuser', password='secret', email='admin@example.com'
+            )
+            c = Client()
+            c.login(username='superuser', password='secret')                
+
+        
+
+            #run test
+            response = self.roomtypemodeladmin.occupancy_30_Days(itemtype)
+            
+            self.assertEqual(response,'10.0')
+
+            
       
 
 # ---------------------------------------------------
@@ -188,7 +325,7 @@ class TestRoomBookModels(TestCase):
     #     # create User instance
     #     user_model = get_user_model()
     #     self.user = user_model.objects.create_user(username='brian',
-    #                                                password='dogskin12')
+    #                                                password='dog12')
 
         
     #     # create instance of Room                                          
@@ -381,16 +518,6 @@ class TestRoomBookModels(TestCase):
         # print(len(Booking.objects.all()))
         # self.assertRedirects(response, ' ')
 
-#    def test_can_add_item(self):
-#         response = self.client.post('/add', {'name': 'Test Added Item'})
-#         self.assertRedirects(response, '/')
-
-#     def test_can_delete_item(self):
-#         item = Item.objects.create(name='Test Todo Item')
-#         response = self.client.get(f'/delete/{item.id}')
-#         self.assertRedirects(response, '/')
-#         existing_items = Item.objects.filter(id=item.id)
-#         self.assertEqual(len(existing_items), 0)
 
 
 

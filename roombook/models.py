@@ -5,7 +5,7 @@ from datetime import datetime, date
 
 class markoutdatedasinactive(models.Manager):
     """ 
-    determines if the booking is past-tense and changes the isactive field to false if so
+    determines if the booking is past-tense and changes the is_active field to false if so
     """
 
     def set_inactive(self,bookings):
@@ -23,8 +23,8 @@ class markoutdatedasinactive(models.Manager):
         bookings = self.set_inactive(bookings)
         return bookings
 
-###  can i filter the booking to only include records that are active
-### when is this activated ? everytime the model is accessed yes it is
+###  can i filter the booking to only include records that are active can i chain methods, tryit out 
+### when is this activated ? everytime the model is accessed? everytime the all is called?
 ### is it possible to activate only once per day at say mdnight  
 
 
@@ -64,6 +64,7 @@ class Booking(models.Model):
     check_in = models.DateField(null=True)
     check_out = models.DateField(null=True)
     is_active = models.BooleanField(default= True)
+
 
     objects = markoutdatedasinactive()
 

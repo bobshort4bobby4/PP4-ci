@@ -15,11 +15,9 @@ class AvailabilityView(View):
     form_class = AvailabilityForm
 
     def get(self, request, *args, **kwargs):
+       
         type = self.kwargs.get('type', None)
         desc = RoomType.objects.get(type=type)
-       
-     
-       
         Room_Types = ['Single', 'Queen', 'Double']
         if  type in Room_Types:
                 form = AvailabilityForm()
@@ -47,7 +45,7 @@ class AvailabilityView(View):
             typeint = 3
         else:
             messages.warning(request, 'That size unit does not exist..')
-            return redirect(reverse('roombook:home'))
+            return redirect(reverse('home:home'))
             
 
 
@@ -63,7 +61,7 @@ class AvailabilityView(View):
             messages.warning(request, 'Form not valid')
             return redirect( reverse('roombook:book_1',kwargs={'type':type}))
         
-        available_rooms = [] # empty list to hold units that have availability for desired dates
+        available_rooms = [] # empty list to hold rooms that have availability for desired dates
         
         
 
@@ -96,7 +94,7 @@ class AvailabilityView(View):
             }
 
             # send to book template
-            return redirect('/roombook/book/<booking>/', booking)
+            return redirect('/roombook/book/', booking)
                       
                                      
         else:
@@ -106,6 +104,9 @@ class AvailabilityView(View):
                
 
 class BookView(View):
+    """
+    get displays booking, post makes booking
+    """
     model = Booking
     template_name = 'roombook/book.html'
 
@@ -133,7 +134,7 @@ class BookView(View):
 
         countbookedrooms = int(len(bookedrooms))
         counttotalroom = Room.objects.all().count()
-        # if occupancy rate below 60% set sale flag to true
+        # if occupancy rate below 50% set sale flag to true
         occrate = (countbookedrooms/counttotalroom)*100
         if (occrate) < 50:
             sale_flag = True

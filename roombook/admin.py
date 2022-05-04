@@ -6,7 +6,7 @@ from datetime import date, timedelta
 
 @admin.register(RoomType)
 class RoomTypeAdmin(admin.ModelAdmin):
-    list_display = ('type', 'price', 'occupancy_14_Days', 'occupancy_30_Days' )
+    list_display = ('type', 'price', 'occupancy_14_Days',  'occupancy_30_Days')
 
     def occupancy_14_Days(self,obj):
         today = date.today()
@@ -26,7 +26,7 @@ class RoomTypeAdmin(admin.ModelAdmin):
         booked_days = 0
         # iterate through booking and count which days are booked for each room
         for booking in bookings:
-            for day in range(0,13):
+            for day in range(0,14):
                 dat =today + timedelta(days=day)
                 if dat >= booking.check_in and dat < booking.check_out:
                     booked_days += 1
@@ -53,7 +53,7 @@ class RoomTypeAdmin(admin.ModelAdmin):
         booked_days = 0
         # iterate through booking and count which days are booked for each room
         for booking in bookings:
-            for day in range(0,29):
+            for day in range(0,30):
                 dat =today + timedelta(days=day)
                 if dat >= booking.check_in and dat < booking.check_out:
                     booked_days += 1
@@ -80,4 +80,5 @@ class RoomAdmin(admin.ModelAdmin):
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     list_display = ('user', 'room_number',  'check_in', 'check_out', 'is_active')
+    list_filter = ('is_active', 'room_number')
 

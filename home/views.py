@@ -11,7 +11,8 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['room_types'] = RoomType.objects.all()
-        context['reviews'] = Reviews.objects.all()
+        # only showcase reviews which are approved
+        context['reviews'] = Reviews.objects.filter(approved= True)
         return context
 
 class InfoView(TemplateView):

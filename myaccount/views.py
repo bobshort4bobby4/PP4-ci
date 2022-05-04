@@ -99,12 +99,17 @@ class ExtendBooking(View):
             co = data['check_out']
             bookid.check_out =  co
             bookid.save()
-            # bookid.save(update_fields=["check_out"=data['check_out']) 
+
             messages.success(request, f"Thank you for extending room { bookid.room_number } to { data['check_out'] }")
             return redirect(reverse('home:home'))
         else:
             messages.warning(request, "Sorry that room is not available for those dates, try another room")
             return redirect(reverse('home:home'))
+
+
+
+
+            
     #     def form_valid(self, form):
     #         instance = form.save(commit=False)
     #         instance.check_out = self.request.check_out
