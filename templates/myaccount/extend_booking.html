@@ -9,11 +9,28 @@
             <div>Check In: {{ bookid.check_in}}</div>
             <div>Old Check Out: {{ bookid.check_out}}</div>
             <div>Enter new desired check out date </div>
-            <form  class="d-flex flex-column " style="color:white; font-size:medium;" action="" method="POST">
-                {{ form.as_p }}
-                {% csrf_token %}
-                <button type="submit">Extend </button>
-            </form>
+            <div>
+                <form  class="d-flex flex-column " style="color:white; font-size:medium;" action="" method="POST">
+                    {% csrf_token %}
+                        <div class="field">
+                            <div class="control" style="color:black;">
+                                {{ form.new_check_out}}
+                            
+                            </div>
+                            <!--form error messages------------------>
+                        
+                            {% for error in form.check_out.errors %}
+                                <p class="help is-danger">{{ error|safe }} </p>
+                            {% endfor %}
+                            
+                            <!--end of form error messages------------->
+                        </div>
+                        <div>
+                            <button type="submit" style="display:block;">Extend </button>
+                        </div>
+                    
+                </form>
+            </div>
         
             <!-- <h1 style="color:red;">testtestets{{booking.id}}{{booking.user}}{{booking.check_in}} {{booking.check_out}}</h1> -->
         </div>

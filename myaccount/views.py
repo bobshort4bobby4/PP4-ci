@@ -48,7 +48,7 @@ class CancelBooking(SuccessMessageMixin, DeleteView):
         booking = get_object_or_404(Booking, pk=bookid)
         checkin = booking.check_in
         print((checkin - today).days)
-        if (checkin - today).days > 7:
+        if (checkin - today).days >= 7:
             return render(request, self.template_name, {'booking':booking})
         elif (checkin - today).days < 7:
             messages.warning(request, 'Sorry! Cancelation only possible if checkin date is more than 7 days away')
@@ -70,9 +70,13 @@ class ExtendBooking(View):
     
     
     def get(self, request, *args, **kwargs):
-        form = ExtendBookingForm()
+        
         bookid = type = self.kwargs.get('pk', None)
+
         bookid = get_object_or_404(Booking, pk=bookid)
+        
+       
+        form = ExtendBookingForm(bookid.check_out)
     
         context = {
             'bookid': bookid,
@@ -85,22 +89,30 @@ class ExtendBooking(View):
     def post(self, request, *args, **kwargs):
         bookid = type = self.kwargs.get('pk', None)
         bookid = get_object_or_404(Booking, pk=bookid)
-        form = ExtendBookingForm(request.POST)
+        formdata = {
+            'User': bookid.user.username,
+            'Room':bookid.room_number_id,
+            'Check-In':bookid.check_in,
+            'Old-Check-Out':bookid.check_out,
+
+            }
+        form = ExtendBookingForm( bookid.check_out, request.POST)
 
         if form.is_valid():
             data = form.cleaned_data
         else:
-            messages.warning(request, 'Form not valid')
+            messages.warning(request, 'Form not valid, New check-out date must be after old check-out date')
+            form = ExtendBookingForm(bookid.check_out)
             return redirect( reverse('myaccount:myaccount'))
         print(kwargs)
         print(data)
 
-        if check_extendability(bookid.room_number, bookid.check_out, data['check_out']):
-            co = data['check_out']
+        if check_extendability(bookid.room_number, bookid.check_out, data['new_check_out']):
+            co = data['new_check_out']
             bookid.check_out =  co
             bookid.save()
 
-            messages.success(request, f"Thank you for extending room { bookid.room_number } to { data['check_out'] }")
+            messages.success(request, f"Thank you for extending room { bookid.room_number } to { data['new_check_out'] }")
             return redirect(reverse('home:home'))
         else:
             messages.warning(request, "Sorry that room is not available for those dates, try another room")

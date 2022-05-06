@@ -13,6 +13,7 @@
 {% endblock %}
 
 {% block corecss %} 
+<link rel="icon" type="image/png" sizes="16x16" href="/media/flowernew.png">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato&display=swap">
 <link rel="stylesheet" href="{% static 'css/style.css' %}">  
@@ -38,7 +39,7 @@
     <header>
         <div class="container" style=" padding:0px !important;">
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <a class="navbar-brand" href="{% url 'home:home' %}"><img class="brand"  src="/media/flowerlogoresized.png" alt=""></a>
+                <a class="navbar-brand" href="{% url 'home:home' %}"><img class="brand"  src="/media/flowernewheader.png" alt=""></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
                 </button>
@@ -119,5 +120,14 @@
             alert.close();
         }, 2500);
     </script>
+    <!---remore errors from error list-->
+    <script>
+        setTimeout(function() {
+          let errors = document.getElementsByClassName('errorlist');
+          while(errors.length > 0) {
+            errors[0].parentNode.removeChild(errors[0]);
+          }
+        }, 3000);
+      </script>
 </body>
 

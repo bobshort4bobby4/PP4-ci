@@ -2,7 +2,15 @@ html{
     height:100%;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap');
 
+
+* {
+    font-family: 'Playfair Display', serif;
+    padding:0;
+    border:none;
+    margin:0;
+}
 body {
     background: url('/media/backgrd.png') no-repeat center center fixed;
     background-size: cover;
