@@ -8,10 +8,10 @@ from django.shortcuts import get_object_or_404
 from forms.forms import CancelConfirmForm, ExtendBookingForm
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
-from booking_code.check_availability import check_extendability
+from booking_code.check_extendability import check_extendability
 
 
-class ShowDetails(ListView):
+class ShowDetails(ListView):# happy
     
     template_name = "myaccount/myaccount.html"
     model = Booking
@@ -22,12 +22,13 @@ class ShowDetails(ListView):
             user=self.request.user, is_active=True)
  
 
-class CancelBooking(SuccessMessageMixin, DeleteView):
+class CancelBooking(SuccessMessageMixin, DeleteView):# think im happy custom code has to go somewhere?
+    # set queryset to one booking selected by user, passed in kwargs
     def get_queryset(self):
         pk = self.kwargs.get('pk', None)
         return Booking.objects.filter(
             pk=pk)
-
+    # add message into delete method
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super(CancelBooking, self).delete(request, *args, **kwargs)
@@ -39,15 +40,12 @@ class CancelBooking(SuccessMessageMixin, DeleteView):
     success_url = reverse_lazy("home:home")
     success_message  = "The booking has been canceled"
     
-
-   
-
+    # overriding get method to check the chrckin date is not too close
     def get(self, request, *args, **kwargs):
         bookid = self.kwargs.get('pk', None)
         today = date.today()
         booking = get_object_or_404(Booking, pk=bookid)
         checkin = booking.check_in
-        print((checkin - today).days)
         if (checkin - today).days >= 7:
             return render(request, self.template_name, {'booking':booking})
         elif (checkin - today).days < 7:
@@ -61,59 +59,48 @@ class CancelBooking(SuccessMessageMixin, DeleteView):
 
 
 
-class ExtendBooking(View):
+class ExtendBooking(View):# not happy with this one, working ok
     
-    # model =Booking
-    # fields = [ 'check_out']
     template_name = 'myaccount/extend_booking.html'
-    # success_url = reverse_lazy("home:home")
     
-    
-    def get(self, request, *args, **kwargs):
-        
-        bookid = type = self.kwargs.get('pk', None)
 
+    def get(self, request, *args, **kwargs):
+        # pass booking data into template
+        bookid = self.kwargs.get('pk', None)
         bookid = get_object_or_404(Booking, pk=bookid)
-        
-       
+        # pass old check-out date into form for validation
         form = ExtendBookingForm(bookid.check_out)
-    
         context = {
             'bookid': bookid,
             'form': form
         }
-
         return render(request, self.template_name, context)
 
 
     def post(self, request, *args, **kwargs):
+        # pass booking data into template
         bookid = type = self.kwargs.get('pk', None)
         bookid = get_object_or_404(Booking, pk=bookid)
-        formdata = {
-            'User': bookid.user.username,
-            'Room':bookid.room_number_id,
-            'Check-In':bookid.check_in,
-            'Old-Check-Out':bookid.check_out,
-
-            }
+        # pass old check-out date into form for validation and form data
         form = ExtendBookingForm( bookid.check_out, request.POST)
 
+        # if new check-out date valid continue else display error alert and redirect
         if form.is_valid():
             data = form.cleaned_data
         else:
             messages.warning(request, 'Form not valid, New check-out date must be after old check-out date')
-            form = ExtendBookingForm(bookid.check_out)
             return redirect( reverse('myaccount:myaccount'))
-        print(kwargs)
-        print(data)
 
+        # if particlar room availabile extend booking,
+        #  display thank you info and redirect to home
         if check_extendability(bookid.room_number, bookid.check_out, data['new_check_out']):
-            co = data['new_check_out']
-            bookid.check_out =  co
+            bookid.check_out =  data['new_check_out']
             bookid.save()
-
-            messages.success(request, f"Thank you for extending room { bookid.room_number } to { data['new_check_out'] }")
+            messages.success(
+                            request, f"Thank you for extending room { bookid.room_number } \
+                            to { data['new_check_out'] }")
             return redirect(reverse('home:home'))
+        # display alert about room not available and redirect
         else:
             messages.warning(request, "Sorry that room is not available for those dates, try another room")
             return redirect(reverse('home:home'))
@@ -121,17 +108,4 @@ class ExtendBooking(View):
 
 
 
-            
-    #     def form_valid(self, form):
-    #         instance = form.save(commit=False)
-    #         instance.check_out = self.request.check_out
-    #         super(ExtendBooking(), self).save(form)
-
-
-    #     bookid = type = self.kwargs.get('pk', None)
-    #     bookid = get_object_or_404(Booking, pk=bookid)
-        
-    #     if check_availability(bookid.room_number, bookid.check_out, bookid.check_out):
-    #         pass
-
-        # return redirect(reverse('myaccount:myaccount'))
+  

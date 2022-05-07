@@ -5,7 +5,7 @@ from roombook.models import  RoomType
 from reviews.models import Reviews
 
 # Create your views here.
-class HomeView(TemplateView):
+class HomeView(TemplateView):# happpy
     template_name = "home/home.html"
 
     def get_context_data(self, **kwargs):
@@ -15,9 +15,9 @@ class HomeView(TemplateView):
         context['reviews'] = Reviews.objects.filter(approved= True)
         return context
 
-class InfoView(TemplateView):
+class InfoView(TemplateView):# happy
     template_name = 'home/info.html'
 
 
-class ContactView(TemplateView):
+class ContactView(TemplateView):# happy
     template_name = 'home/contact.html'

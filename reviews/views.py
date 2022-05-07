@@ -6,7 +6,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 
 
-class ReviewView(ListView):
+class ReviewView(ListView): # happy
     model = Reviews
     template_name = 'reviews/review.html'
     context_object_name = 'hotel_reviews'
@@ -19,7 +19,7 @@ class ReviewView(ListView):
             is_active=True)
 
 
-class CreateReview(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class CreateReview(LoginRequiredMixin, SuccessMessageMixin, CreateView):# happy
     model = Reviews
     login_url = '/'
     template_name = 'reviews/create_review.html'
